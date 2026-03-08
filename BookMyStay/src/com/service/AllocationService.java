@@ -8,6 +8,12 @@ public class AllocationService {
 
     private Set<String> bookedRoomIds = new HashSet<>();
     private HashMap<String, Set<String>> roomAllocations = new HashMap<>();
+    
+    private int reservationCounter = 100;
+    public String generateReservationId() {
+        reservationCounter++;
+        return "RES" + reservationCounter;
+    }
 
     // Allocate room
     public String allocateRoom(String roomType) {

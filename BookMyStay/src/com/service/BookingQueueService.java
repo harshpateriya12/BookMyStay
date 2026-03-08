@@ -12,6 +12,8 @@ public class BookingQueueService {
     private InventoryService inventoryService;
     private AllocationService allocationService;
 
+    private int reservationCounter = 100;
+
     public BookingQueueService(InventoryService inventoryService,
                                AllocationService allocationService) {
 
@@ -19,21 +21,31 @@ public class BookingQueueService {
         this.allocationService = allocationService;
     }
 
-    // Add booking request
+    // Generate reservation ID
+    private String generateReservationId() {
+        reservationCounter++;
+        return "RES" + reservationCounter;
+    }
+
+    // Add booking request to queue
     public void addBookingRequest(String guestName, String roomType) {
 
-        Reservation reservation = new Reservation(guestName, roomType);
+        String reservationId = generateReservationId();
+
+        Reservation reservation =
+                new Reservation(reservationId, guestName, roomType);
 
         bookingQueue.add(reservation);
 
-        System.out.println("Booking request added to queue.");
+        System.out.println("Booking request added.");
+        System.out.println("Reservation ID: " + reservationId);
     }
 
-    // Process booking
+    // Process booking request (FIFO)
     public void processBooking() {
 
         if (bookingQueue.isEmpty()) {
-            System.out.println("No booking requests.");
+            System.out.println("No booking requests in queue.");
             return;
         }
 
@@ -41,18 +53,25 @@ public class BookingQueueService {
 
         String guest = reservation.getGuestName();
         String roomType = reservation.getRoomType();
+        String reservationId = reservation.getReservationId();
 
         int availableRooms =
-                inventoryService.getRoomInventory().getOrDefault(roomType, 0);
+                inventoryService.getRoomInventory()
+                        .getOrDefault(roomType, 0);
 
         if (availableRooms > 0) {
 
-            String roomId = allocationService.allocateRoom(roomType);
+            String roomId =
+                    allocationService.allocateRoom(roomType);
 
-            inventoryService.updateRoomCount(roomType, availableRooms - 1);
+            inventoryService.updateRoomCount(
+                    roomType,
+                    availableRooms - 1
+            );
 
-            System.out.println("\nBooking Confirmed!");
+            System.out.println("\nBooking Confirmed");
             System.out.println("Guest: " + guest);
+            System.out.println("Reservation ID: " + reservationId);
             System.out.println("Room Type: " + roomType);
             System.out.println("Allocated Room ID: " + roomId);
         }
@@ -61,7 +80,7 @@ public class BookingQueueService {
         }
     }
 
-    // View queue
+    // View booking queue
     public void viewQueue() {
 
         if (bookingQueue.isEmpty()) {
@@ -72,7 +91,13 @@ public class BookingQueueService {
         System.out.println("\nPending Booking Requests:");
 
         for (Reservation r : bookingQueue) {
-            System.out.println(r.getGuestName() + " -> " + r.getRoomType());
+
+            System.out.println(
+                    r.getReservationId() + " | "
+                            + r.getGuestName()
+                            + " -> "
+                            + r.getRoomType()
+            );
         }
     }
 }
