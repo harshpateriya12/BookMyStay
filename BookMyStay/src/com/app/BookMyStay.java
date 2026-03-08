@@ -5,6 +5,7 @@ import java.util.Scanner;
 import com.service.InventoryService;
 import com.service.searchService;
 import com.service.BookingQueueService;
+import com.service.AllocationService;
 
 public class BookMyStay {
 
@@ -12,7 +13,10 @@ public class BookMyStay {
 
         InventoryService inventoryService = new InventoryService();
         searchService searchService = new searchService(inventoryService);
-        BookingQueueService bookingService = new BookingQueueService(inventoryService);
+        AllocationService allocationService = new AllocationService();
+
+        BookingQueueService bookingService =
+                new BookingQueueService(inventoryService, allocationService);
 
         Scanner sc = new Scanner(System.in);
 
@@ -26,10 +30,10 @@ public class BookMyStay {
             System.out.println("3. Update Room Price");
             System.out.println("4. View Inventory");
             System.out.println("5. Search Available Rooms");
-            System.out.println("6. Check Room Availability");
-            System.out.println("7. Add Booking Request");
-            System.out.println("8. Process Booking");
-            System.out.println("9. View Booking Queue");
+            System.out.println("6. Add Booking Request");
+            System.out.println("7. Process Booking");
+            System.out.println("8. View Booking Queue");
+            System.out.println("9. View Allocated Rooms");
             System.out.println("10. Exit");
 
             choice = sc.nextInt();
@@ -41,10 +45,10 @@ public class BookMyStay {
                     System.out.println("Enter Room Type:");
                     String type = sc.nextLine();
 
-                    System.out.println("Enter Room Count:");
+                    System.out.println("Enter Count:");
                     int count = sc.nextInt();
 
-                    System.out.println("Enter Room Price:");
+                    System.out.println("Enter Price:");
                     double price = sc.nextDouble();
 
                     inventoryService.addRoomType(type, count, price);
@@ -79,17 +83,6 @@ public class BookMyStay {
                     break;
 
                 case 6:
-                    System.out.println("Enter Room Type:");
-                    type = sc.nextLine();
-
-                    boolean available = searchService.isRoomAvailable(type);
-
-                    if (available) {
-                        System.out.println("Room is available.");
-                    }
-                    break;
-
-                case 7:
                     System.out.println("Enter Guest Name:");
                     String guest = sc.nextLine();
 
@@ -99,12 +92,16 @@ public class BookMyStay {
                     bookingService.addBookingRequest(guest, type);
                     break;
 
-                case 8:
+                case 7:
                     bookingService.processBooking();
                     break;
 
-                case 9:
+                case 8:
                     bookingService.viewQueue();
+                    break;
+
+                case 9:
+                    allocationService.viewAllocations();
                     break;
 
                 case 10:

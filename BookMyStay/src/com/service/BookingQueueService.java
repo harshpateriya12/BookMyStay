@@ -8,10 +8,15 @@ import com.model.Reservation;
 public class BookingQueueService {
 
     private Queue<Reservation> bookingQueue = new LinkedList<>();
-    private InventoryService inventoryService;
 
-    public BookingQueueService(InventoryService inventoryService) {
+    private InventoryService inventoryService;
+    private AllocationService allocationService;
+
+    public BookingQueueService(InventoryService inventoryService,
+                               AllocationService allocationService) {
+
         this.inventoryService = inventoryService;
+        this.allocationService = allocationService;
     }
 
     // Add booking request
@@ -24,27 +29,33 @@ public class BookingQueueService {
         System.out.println("Booking request added to queue.");
     }
 
-    // Process bookings FIFO
+    // Process booking
     public void processBooking() {
 
         if (bookingQueue.isEmpty()) {
-            System.out.println("No booking requests in queue.");
+            System.out.println("No booking requests.");
             return;
         }
 
         Reservation reservation = bookingQueue.poll();
 
-        String roomType = reservation.getRoomType();
         String guest = reservation.getGuestName();
+        String roomType = reservation.getRoomType();
 
-        int availableRooms = inventoryService.getRoomInventory().getOrDefault(roomType, 0);
+        int availableRooms =
+                inventoryService.getRoomInventory().getOrDefault(roomType, 0);
 
         if (availableRooms > 0) {
 
+            String roomId = allocationService.allocateRoom(roomType);
+
             inventoryService.updateRoomCount(roomType, availableRooms - 1);
 
-            System.out.println("Booking confirmed for " + guest + " | Room Type: " + roomType);
-        } 
+            System.out.println("\nBooking Confirmed!");
+            System.out.println("Guest: " + guest);
+            System.out.println("Room Type: " + roomType);
+            System.out.println("Allocated Room ID: " + roomId);
+        }
         else {
             System.out.println("Room not available for " + guest);
         }
@@ -54,7 +65,7 @@ public class BookingQueueService {
     public void viewQueue() {
 
         if (bookingQueue.isEmpty()) {
-            System.out.println("Booking queue is empty.");
+            System.out.println("Booking queue empty.");
             return;
         }
 
