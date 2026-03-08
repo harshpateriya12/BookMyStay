@@ -11,14 +11,18 @@ public class BookingQueueService {
 
     private InventoryService inventoryService;
     private AllocationService allocationService;
+    private BookingHistoryService historyService;
 
     private int reservationCounter = 100;
 
-    public BookingQueueService(InventoryService inventoryService,
-                               AllocationService allocationService) {
+    public BookingQueueService(
+            InventoryService inventoryService,
+            AllocationService allocationService,
+            BookingHistoryService historyService) {
 
         this.inventoryService = inventoryService;
         this.allocationService = allocationService;
+        this.historyService = historyService;
     }
 
     // Generate reservation ID
@@ -27,7 +31,7 @@ public class BookingQueueService {
         return "RES" + reservationCounter;
     }
 
-    // Add booking request to queue
+    // Add booking request
     public void addBookingRequest(String guestName, String roomType) {
 
         String reservationId = generateReservationId();
@@ -68,6 +72,9 @@ public class BookingQueueService {
                     roomType,
                     availableRooms - 1
             );
+
+            // store in booking history
+            historyService.addReservation(reservation);
 
             System.out.println("\nBooking Confirmed");
             System.out.println("Guest: " + guest);
