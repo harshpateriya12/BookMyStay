@@ -1,38 +1,64 @@
 package com.service;
 
 import java.util.HashMap;
+import java.util.Map;
 
 public class InventoryService {
-    //use of hashmap
-    HashMap<String, Integer> roomCount = new HashMap<>();
-    HashMap<String, Double> roomPrice = new HashMap<>();
 
+    private HashMap<String, Integer> roomInventory = new HashMap<>();
+    private HashMap<String, Double> roomPrices = new HashMap<>();
+
+    // Add room type
     public void addRoomType(String type, int count, double price) {
-        roomCount.put(type, count);
-        roomPrice.put(type, price);
+
+        roomInventory.put(type, count);
+        roomPrices.put(type, price);
+
+        System.out.println(type + " room added successfully.");
     }
 
+    // Update room count
     public void updateRoomCount(String type, int count) {
-        if (roomCount.containsKey(type)) {
-            roomCount.put(type, count);
+
+        if (roomInventory.containsKey(type)) {
+            roomInventory.put(type, count);
+            System.out.println("Room count updated.");
         } else {
-            System.out.println("Room type not found");
+            System.out.println("Room type not found.");
         }
     }
 
+    // Update room price
     public void updateRoomPrice(String type, double price) {
-        if (roomPrice.containsKey(type)) {
-            roomPrice.put(type, price);
+
+        if (roomPrices.containsKey(type)) {
+            roomPrices.put(type, price);
+            System.out.println("Room price updated.");
         } else {
-            System.out.println("Room type not found");
+            System.out.println("Room type not found.");
         }
     }
 
-    public void showInventory() {
-        System.out.println("Room Type\tAvailable\tPrice");
+    // Read-only access for search service
+    public Map<String, Integer> getRoomInventory() {
+        return roomInventory;
+    }
 
-        for (String type : roomCount.keySet()) {
-            System.out.println(type + "\t\t" + roomCount.get(type) + "\t\t" + roomPrice.get(type));
+    public Map<String, Double> getRoomPrices() {
+        return roomPrices;
+    }
+
+    // Show inventory (Admin view)
+    public void showAvailability() {
+
+        System.out.println("\nHotel Inventory:");
+
+        for (String type : roomInventory.keySet()) {
+
+            int count = roomInventory.get(type);
+            double price = roomPrices.get(type);
+
+            System.out.println(type + " | Rooms: " + count + " | Price: " + price);
         }
     }
 }

@@ -1,13 +1,17 @@
 package com.app;
 
 import java.util.Scanner;
-import com.service.InventoryService;
 
-public class UCOneBookMyStay {
+import com.service.InventoryService;
+import com.service.searchService;
+
+public class BookMyStay {
 
     public static void main(String[] args) {
 
         InventoryService service = new InventoryService();
+        searchService searchService = new searchService(service);
+
         Scanner sc = new Scanner(System.in);
 
         int choice;
@@ -19,11 +23,14 @@ public class UCOneBookMyStay {
             System.out.println("2. Update Room Count");
             System.out.println("3. Update Room Price");
             System.out.println("4. View Inventory");
-            System.out.println("5. Exit");
+            System.out.println("5. Search Available Rooms (Guest)");
+            System.out.println("6. Check Room Availability");
+            System.out.println("7. Exit");
 
             choice = sc.nextInt();
             sc.nextLine();
-            //using switch cases for better time complexity
+
+            // using switch for better readability
             switch (choice) {
 
                 case 1:
@@ -60,10 +67,26 @@ public class UCOneBookMyStay {
                     break;
 
                 case 4:
-                    service.showInventory();
+                    service.showAvailability();
                     break;
 
+                // UC2 Integration
                 case 5:
+                    searchService.searchAvailableRooms();
+                    break;
+
+                case 6:
+                    System.out.println("Enter Room Type to Check:");
+                    type = sc.nextLine();
+
+                    boolean available = searchService.isRoomAvailable(type);
+
+                    if (available) {
+                        System.out.println("Room is available for booking.");
+                    }
+                    break;
+
+                case 7:
                     System.out.println("Exiting...");
                     break;
 
@@ -71,7 +94,7 @@ public class UCOneBookMyStay {
                     System.out.println("Invalid choice");
             }
 
-        } while (choice != 5);
+        } while (choice != 7);
 
         sc.close();
     }
